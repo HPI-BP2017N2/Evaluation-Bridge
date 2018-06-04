@@ -2,7 +2,9 @@ package de.hpi.evaluationbridge.api;
 
 import de.hpi.evaluationbridge.dto.EmptySuccessResponse;
 import de.hpi.evaluationbridge.dto.ErrorResponse;
+import de.hpi.evaluationbridge.dto.SuccessResponse;
 import de.hpi.evaluationbridge.exception.FetchProcessAlreadyRunningException;
+import de.hpi.evaluationbridge.exception.SampleOfferDoesNotExistException;
 import de.hpi.evaluationbridge.service.ISampleOfferService;
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -45,5 +47,11 @@ public class SampleOfferController {
             throw new FetchProcessAlreadyRunningException("Fetch process for shop " + shopID + " is already running.");
         getSampleOffersService().fetchSampleOffersForShop(shopID, offerCount);
         return new EmptySuccessResponse().withMessage("Triggered fetching sample offers for shop: " + shopID).send();
+    }
+
+    @RequestMapping(value = "/sampleOffers/{shopID}", method = RequestMethod.GET, produces = "application/json")
+    public HttpEntity<Object> getSampleOffers(@PathVariable long shopID) throws SampleOfferDoesNotExistException {
+        return new SuccessResponse<>(getSampleOffersService().getStoredSampleOffer(shopID)).withMessage("Successfully" +
+                " fetched sample offer for shop " + shopID).send();
     }
 }

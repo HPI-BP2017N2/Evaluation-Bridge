@@ -4,8 +4,10 @@ import de.hpi.evaluationbridge.persistence.SampleOffer;
 import org.springframework.data.mongodb.repository.MongoRepository;
 import org.springframework.stereotype.Repository;
 
+import java.util.Optional;
+
 @Repository
 public interface ISampleOfferRepository extends MongoRepository<SampleOffer, Long> {
 
-    SampleOffer findByShopID(long shopID);
+    Optional<SampleOffer> findByShopID(long shopID);
 }

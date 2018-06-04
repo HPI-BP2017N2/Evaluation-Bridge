@@ -3,6 +3,7 @@ package de.hpi.evaluationbridge.service;
 import de.hpi.evaluationbridge.dto.IdealoOffer;
 import de.hpi.evaluationbridge.dto.IdealoOffers;
 import de.hpi.evaluationbridge.exception.NotEnoughOffersException;
+import de.hpi.evaluationbridge.exception.SampleOfferDoesNotExistException;
 import de.hpi.evaluationbridge.persistence.SampleOffer;
 import de.hpi.evaluationbridge.persistence.SamplePage;
 import de.hpi.evaluationbridge.persistence.repository.ISampleOfferRepository;
@@ -16,9 +17,11 @@ import org.jsoup.nodes.Document;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
+import javax.net.ssl.SSLHandshakeException;
 import java.io.IOException;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.CopyOnWriteArraySet;
 
@@ -64,6 +67,12 @@ public class SampleOfferService implements ISampleOfferService {
         getFetchProcesses().remove(shopID);
     }
 
+    @Override
+    public SampleOffer getStoredSampleOffer(long shopID) throws SampleOfferDoesNotExistException {
+        Optional<SampleOffer> sampleOffer = getSampleOfferRepository().findByShopID(shopID);
+        return sampleOffer.orElseThrow(() -> new SampleOfferDoesNotExistException("No sample offer for shop " + shopID));
+    }
+
     private void storeSamplePagesAndUpdateUrl(IdealoOffers offers) {
         offers.forEach(offer -> {
             SamplePage page = getSamplePageRepository().save(new SamplePage(offer.getFetchedPage().html()));
@@ -79,7 +88,11 @@ public class SampleOfferService implements ISampleOfferService {
             if (offerCounter == targetOfferCount) {
                 iterator.remove();
             } else {
-                fetchHTMLForOffer(offer);
+                try {
+                    fetchHTMLForOffer(offer);
+                } catch (SSLHandshakeException e) {
+                    throw new NotEnoughOffersException("Can not fetch any site of shop " + shopID);
+                }
                 if (offer.getFetchedPage() == null) iterator.remove();
                 else {
                     offerCounter++;
@@ -92,7 +105,7 @@ public class SampleOfferService implements ISampleOfferService {
                 "requested!");
     }
 
-    private void fetchHTMLForOffer(IdealoOffer offer) {
+    private void fetchHTMLForOffer(IdealoOffer offer) throws SSLHandshakeException {
         List<String> urls = offer.get(OfferAttribute.URL);
         if (urls == null || urls.isEmpty()) return;
         try {
@@ -101,6 +114,8 @@ public class SampleOfferService implements ISampleOfferService {
                     .userAgent("Mozilla/5.0 (compatible; HPI-BPN2-2017/2.1; https://hpi.de/naumann/teaching/bachelorprojekte/inventory-management.html)")
                     .get();
             offer.setFetchedPage(fetchedPage);
+        }catch (SSLHandshakeException e) {
+            throw e;
         } catch (IOException e) {
             log.error("Could not fetch page " + urls.get(0), e);
         }
