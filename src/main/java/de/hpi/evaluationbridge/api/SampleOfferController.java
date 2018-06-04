@@ -4,6 +4,7 @@ import de.hpi.evaluationbridge.dto.EmptySuccessResponse;
 import de.hpi.evaluationbridge.dto.ErrorResponse;
 import de.hpi.evaluationbridge.dto.SuccessResponse;
 import de.hpi.evaluationbridge.exception.FetchProcessAlreadyRunningException;
+import de.hpi.evaluationbridge.exception.PageNotFoundException;
 import de.hpi.evaluationbridge.exception.SampleOfferDoesNotExistException;
 import de.hpi.evaluationbridge.service.ISampleOfferService;
 import lombok.AccessLevel;
@@ -53,5 +54,11 @@ public class SampleOfferController {
     public HttpEntity<Object> getSampleOffers(@PathVariable long shopID) throws SampleOfferDoesNotExistException {
         return new SuccessResponse<>(getSampleOffersService().getStoredSampleOffer(shopID)).withMessage("Successfully" +
                 " fetched sample offer for shop " + shopID).send();
+    }
+
+    @RequestMapping(value = "/fetchPage/{pageID}", method = RequestMethod.GET)
+    public HttpEntity<Object> fetchPage(@PathVariable String pageID) throws PageNotFoundException {
+        return new SuccessResponse<>(getSampleOffersService().fetchPage(pageID)).withMessage("Successfully" +
+                " fetched page with id " + pageID).send();
     }
 }

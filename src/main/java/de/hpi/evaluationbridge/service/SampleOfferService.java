@@ -3,6 +3,7 @@ package de.hpi.evaluationbridge.service;
 import de.hpi.evaluationbridge.dto.IdealoOffer;
 import de.hpi.evaluationbridge.dto.IdealoOffers;
 import de.hpi.evaluationbridge.exception.NotEnoughOffersException;
+import de.hpi.evaluationbridge.exception.PageNotFoundException;
 import de.hpi.evaluationbridge.exception.SampleOfferDoesNotExistException;
 import de.hpi.evaluationbridge.persistence.SampleOffer;
 import de.hpi.evaluationbridge.persistence.SamplePage;
@@ -68,6 +69,12 @@ public class SampleOfferService implements ISampleOfferService {
     public SampleOffer getStoredSampleOffer(long shopID) throws SampleOfferDoesNotExistException {
         Optional<SampleOffer> sampleOffer = getSampleOfferRepository().findByShopID(shopID);
         return sampleOffer.orElseThrow(() -> new SampleOfferDoesNotExistException("No sample offer for shop " + shopID));
+    }
+
+    @Override
+    public String fetchPage(String pageID) throws PageNotFoundException {
+        Optional<SamplePage> samplePage = getSamplePageRepository().findById(pageID);
+        return samplePage.orElseThrow(() -> new PageNotFoundException("Page with id " + pageID + " does not exists.")).getHtml();
     }
 
     private void storeSamplePagesAndUpdateUrl(IdealoOffers offers) {
