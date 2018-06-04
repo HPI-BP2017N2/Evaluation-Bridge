@@ -19,10 +19,7 @@ import org.springframework.stereotype.Service;
 
 import javax.net.ssl.SSLHandshakeException;
 import java.io.IOException;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 import java.util.concurrent.CopyOnWriteArraySet;
 
 @Service
@@ -51,7 +48,7 @@ public class SampleOfferService implements ISampleOfferService {
         getFetchProcesses().add(shopID);
         log.info("Start fetching process for shop " + shopID + " and " + offerCount + " offer(s)");
 
-        //fetch twice as much offers because some url might be unreachable
+        //fetch twice as much offers because some urls might be unreachable
         IdealoOffers offers = getIdealoBridge().getSampleOffers(shopID, offerCount * 2);
         try {
             fetchPages(offers, offerCount, shopID);
@@ -76,8 +73,8 @@ public class SampleOfferService implements ISampleOfferService {
     private void storeSamplePagesAndUpdateUrl(IdealoOffers offers) {
         offers.forEach(offer -> {
             SamplePage page = getSamplePageRepository().save(new SamplePage(offer.getFetchedPage().html()));
-            offer.get(OfferAttribute.URL).clear();
-            offer.get(OfferAttribute.URL).add(page.getId());
+            offer.getUrls().getValue().clear();
+            offer.getUrls().getValue().put("0", "http://localhost:5221/fetchPage/" + page.getId());
         });
     }
 
@@ -106,8 +103,8 @@ public class SampleOfferService implements ISampleOfferService {
     }
 
     private void fetchHTMLForOffer(IdealoOffer offer) throws SSLHandshakeException {
-        List<String> urls = offer.get(OfferAttribute.URL);
-        if (urls == null || urls.isEmpty()) return;
+        List<String> urls = new LinkedList<>(offer.getUrls().getValue().values());
+        if (urls.isEmpty()) return;
         try {
             Document fetchedPage = Jsoup
                     .connect(urls.get(0))

@@ -1,96 +1,28 @@
 package de.hpi.evaluationbridge.dto;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import de.hpi.evaluationbridge.service.OfferAttribute;
-import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.Setter;
 import org.jsoup.nodes.Document;
 
-import java.util.*;
-import java.util.stream.Collectors;
+import java.util.List;
+import java.util.Map;
 
-@Setter(AccessLevel.PRIVATE)
+@Setter
 @Getter
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class IdealoOffer {
 
-    @JsonIgnore
-    private EnumMap<OfferAttribute, List<String>> offerAttributes;
+    private Document fetchedPage;
 
-    @JsonIgnore
-    @Setter private Document fetchedPage;
+    private Property<String> ean, sku, han, brandName;
 
-    public IdealoOffer() {
-        setOfferAttributes(new EnumMap<>(OfferAttribute.class));
-        Arrays.stream(OfferAttribute.values()).forEach(offerAttribute -> getOfferAttributes().put(offerAttribute, new
-                LinkedList<>()));
-    }
+    private Property<Map<String, String>> titles, description, urls;
 
-    public void setEan(Property<String> ean) {
-        getOfferAttributes().put(OfferAttribute.EAN, toList(ean.getValue()));
-    }
+    private Property<String[]> categoryPaths;
 
-    public void setSku(Property<String> sku) {
-        getOfferAttributes().put(OfferAttribute.SKU, toList(sku.getValue()));
-    }
+    private Property<Map<String, Integer>> prices;
 
-    public void setHan(Property<String> han) {
-        getOfferAttributes().put(OfferAttribute.HAN, toList(han.getValue()));
-    }
+    private Property<Map<String, List<String>>> imageUrls;
 
-    public void setTitles(Property<Map<String, String>> titles) {
-        getOfferAttributes().put(OfferAttribute.TITLE, toList(titles.getValue()));
-    }
-
-    public void setCategoryPaths(Property<String[]> categoryPaths) {
-        getOfferAttributes().put(OfferAttribute.CATEGORY, toList(categoryPaths.getValue()));
-    }
-
-    public void setBrandName(Property<String> brandName) {
-        getOfferAttributes().put(OfferAttribute.BRAND, toList(brandName.getValue()));
-    }
-
-    public void setPrices(Property<Map<String, Integer>> prices) {
-        getOfferAttributes().put(OfferAttribute.PRICE, toList(prices.getValue()));
-    }
-
-    public void setDescription(Property<Map<String, String>> description) {
-        getOfferAttributes().put(OfferAttribute.DESCRIPTION, toList(description.getValue()));
-    }
-
-    public void setUrls(Property<Map<String, String>> urls) {
-        getOfferAttributes().put(OfferAttribute.URL, toList(urls.getValue()));
-    }
-
-    public void setImageUrls(Property<Map<String, List<String>>> imageUrls) {
-        getOfferAttributes().put(OfferAttribute.IMAGE_URLS, mapWithArrayToList(imageUrls.getValue()));
-    }
-
-    public List<String> get(OfferAttribute attribute) {
-        return getOfferAttributes().get(attribute);
-    }
-
-    boolean has(OfferAttribute attribute) { return getOfferAttributes().containsKey(attribute); }
-
-
-    //convert
-    private List<String> toList(Object object) {
-        return new LinkedList<>(Collections.singletonList(String.valueOf(object)));
-    }
-
-    private List<String> toList(Map<String, ?> map) {
-        return map.values().stream().map(String::valueOf).collect(Collectors.toList());
-    }
-
-    private List<String> mapWithArrayToList(Map<String, List<String>> map) {
-        return map.values().stream()
-                .flatMap(Collection::stream)
-                .collect(Collectors.toList());
-    }
-
-    private List<String> toList(String[] array) {
-        return Arrays.asList(array);
-    }
 }
