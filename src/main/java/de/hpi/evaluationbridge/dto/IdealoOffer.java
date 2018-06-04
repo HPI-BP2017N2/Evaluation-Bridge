@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.Getter;
 import lombok.Setter;
 import org.jsoup.nodes.Document;
+import org.springframework.data.annotation.Transient;
 
 import java.util.List;
 import java.util.Map;
@@ -13,6 +14,7 @@ import java.util.Map;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class IdealoOffer {
 
+    @Transient
     private Document fetchedPage;
 
     private Property<String> ean, sku, han, brandName;
