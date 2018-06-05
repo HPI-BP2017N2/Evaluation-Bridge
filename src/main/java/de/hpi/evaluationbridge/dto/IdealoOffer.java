@@ -19,7 +19,7 @@ public class IdealoOffer {
 
     private Property<String> ean, sku, han, brandName;
 
-    private Property<Map<String, String>> titles, description, urls;
+    private Property<Map<String, String>> titles, descriptions, urls;
 
     private Property<String[]> categoryPaths;
 

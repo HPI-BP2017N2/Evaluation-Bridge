@@ -3,11 +3,12 @@ package de.hpi.evaluationbridge.persistence;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.annotation.Id;
+import org.springframework.data.annotation.PersistenceConstructor;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 @Document(collection = "samplePages")
 @Getter
-@RequiredArgsConstructor
+@RequiredArgsConstructor(onConstructor = @__({@PersistenceConstructor}))
 public class SamplePage {
 
     @Id
