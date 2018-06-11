@@ -14,4 +14,6 @@ public interface ISampleOfferService {
     SampleOffer getStoredSampleOffer(long shopID) throws SampleOfferDoesNotExistException;
 
     String fetchPage(String pageID) throws PageNotFoundException;
+
+    String getShopRootUrl(long shopID) throws SampleOfferDoesNotExistException;
 }

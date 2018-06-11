@@ -77,6 +77,13 @@ public class SampleOfferService implements ISampleOfferService {
         return samplePage.orElseThrow(() -> new PageNotFoundException("Page with id " + pageID + " does not exists.")).getHtml();
     }
 
+    @Override
+    public String getShopRootUrl(long shopID) throws SampleOfferDoesNotExistException {
+        Optional<SampleOffer> sampleOffer = getSampleOfferRepository().findByShopID(shopID);
+        return sampleOffer.orElseThrow(() -> new SampleOfferDoesNotExistException("No sample offer for shop " +
+                shopID)).getShopRootUrl();
+    }
+
     private void storeSamplePagesAndUpdateUrl(IdealoOffers offers) {
         offers.forEach(offer -> {
             SamplePage page = getSamplePageRepository().save(new SamplePage(offer.getFetchedPage().html()));

@@ -61,4 +61,10 @@ public class SampleOfferController {
         return new SuccessResponse<>(getSampleOffersService().fetchPage(pageID)).withMessage("Successfully" +
                 " fetched page with id " + pageID).send();
     }
+
+    @RequestMapping(value = "/rootUrl/{shopID}", method = RequestMethod.GET)
+    public HttpEntity<Object> getShopRootUrl(@PathVariable long shopID) throws SampleOfferDoesNotExistException {
+        return new SuccessResponse<>(getSampleOffersService().getShopRootUrl(shopID)).withMessage("Successfully" +
+                " resolved shop root url for shop " + shopID).send();
+    }
 }
