@@ -1,8 +1,6 @@
 package de.hpi.evaluationbridge.api;
 
-import de.hpi.evaluationbridge.dto.EmptySuccessResponse;
-import de.hpi.evaluationbridge.dto.ErrorResponse;
-import de.hpi.evaluationbridge.dto.SuccessResponse;
+import de.hpi.evaluationbridge.dto.*;
 import de.hpi.evaluationbridge.exception.FetchProcessAlreadyRunningException;
 import de.hpi.evaluationbridge.exception.PageNotFoundException;
 import de.hpi.evaluationbridge.exception.SampleOfferDoesNotExistException;
@@ -51,25 +49,26 @@ public class SampleOfferController {
     }
 
     @RequestMapping(value = "/sampleOffers/{shopID}", method = RequestMethod.GET, produces = "application/json")
-    public HttpEntity<Object> getSampleOffers(@PathVariable long shopID) throws SampleOfferDoesNotExistException {
-        return new SuccessResponse<>(getSampleOffersService().getStoredSampleOffer(shopID)).withMessage("Successfully" +
-                " fetched sample offer for shop " + shopID).send();
+    public IdealoOffers getSampleOffers(@PathVariable long shopID) throws SampleOfferDoesNotExistException {
+        return getSampleOffersService().getStoredSampleOffer(shopID).getIdealoOffers();
     }
 
     @RequestMapping(value = "/fetchPage/{pageID}", method = RequestMethod.GET)
-    public HttpEntity<Object> fetchPage(@PathVariable String pageID) throws PageNotFoundException {
-        return new SuccessResponse<>(getSampleOffersService().fetchPage(pageID)).withMessage("Successfully" +
-                " fetched page with id " + pageID).send();
+    public String fetchPage(@PathVariable String pageID) throws PageNotFoundException {
+        return getSampleOffersService().fetchPage(pageID);
     }
 
     @RequestMapping(value = "/rootUrl/{shopID}", method = RequestMethod.GET)
     public HttpEntity<Object> getShopRootUrl(@PathVariable long shopID) throws SampleOfferDoesNotExistException {
-        return new SuccessResponse<>(getSampleOffersService().getShopRootUrl(shopID)).withMessage("Successfully" +
+        String shopRootUrl = getSampleOffersService().getShopRootUrl(shopID);
+        ShopRootUrlResponse response = new ShopRootUrlResponse(0L, shopID, "", shopRootUrl);
+        return new SuccessResponse<>(response).withMessage("Successfully" +
                 " resolved shop root url for shop " + shopID).send();
     }
 
     @RequestMapping(value = "/cleanUrl/{shopID}", method = RequestMethod.GET)
     public HttpEntity<Object> cleanUrl(@PathVariable long shopID, @RequestParam String url) {
-        return new SuccessResponse<>(url).withMessage("Successfully cleaned shop root url for shop " + shopID).send();
+        return new SuccessResponse<>(new CleanUrlResponse(url)).withMessage("Successfully cleaned shop root url for " +
+                "shop " + shopID).send();
     }
 }
