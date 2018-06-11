@@ -67,4 +67,9 @@ public class SampleOfferController {
         return new SuccessResponse<>(getSampleOffersService().getShopRootUrl(shopID)).withMessage("Successfully" +
                 " resolved shop root url for shop " + shopID).send();
     }
+
+    @RequestMapping(value = "/cleanUrl/{shopID}", method = RequestMethod.GET)
+    public HttpEntity<Object> cleanUrl(@PathVariable long shopID, @RequestParam String url) {
+        return new SuccessResponse<>(url).withMessage("Successfully cleaned shop root url for shop " + shopID).send();
+    }
 }
