@@ -49,8 +49,9 @@ public class SampleOfferController {
     }
 
     @RequestMapping(value = "/sampleOffers/{shopID}", method = RequestMethod.GET, produces = "application/json")
-    public IdealoOffers getSampleOffers(@PathVariable long shopID) throws SampleOfferDoesNotExistException {
-        return getSampleOffersService().getStoredSampleOffer(shopID).getIdealoOffers();
+    public List<IdealoOffer> getSampleOffers(@PathVariable long shopID, @RequestParam int maxCount) throws
+            SampleOfferDoesNotExistException {
+        return getSampleOffersService().getStoredSampleOffer(shopID).getIdealoOffers().subList(0, maxCount);
     }
 
     @RequestMapping(value = "/fetchPage/{pageID}", method = RequestMethod.GET)
@@ -59,11 +60,9 @@ public class SampleOfferController {
     }
 
     @RequestMapping(value = "/rootUrl/{shopID}", method = RequestMethod.GET)
-    public HttpEntity<Object> getShopRootUrl(@PathVariable long shopID) throws SampleOfferDoesNotExistException {
+    public ShopRootUrlResponse getShopRootUrl(@PathVariable long shopID) throws SampleOfferDoesNotExistException {
         String shopRootUrl = getSampleOffersService().getShopRootUrl(shopID);
-        ShopRootUrlResponse response = new ShopRootUrlResponse(0L, shopID, "", shopRootUrl);
-        return new SuccessResponse<>(response).withMessage("Successfully" +
-                " resolved shop root url for shop " + shopID).send();
+        return new ShopRootUrlResponse(0L, shopID, "", shopRootUrl);
     }
 
     @RequestMapping(value = "/cleanUrl/{shopID}", method = RequestMethod.GET)

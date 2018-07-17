@@ -15,6 +15,9 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
+import org.springframework.boot.context.event.ApplicationReadyEvent;
+import org.springframework.cache.annotation.Cacheable;
+import org.springframework.context.event.EventListener;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
@@ -72,12 +75,14 @@ public class SampleOfferService implements ISampleOfferService {
     }
 
     @Override
+    @Cacheable(value = "pages")
     public String fetchPage(String pageID) throws PageNotFoundException {
         Optional<SamplePage> samplePage = getSamplePageRepository().findById(pageID);
         return samplePage.orElseThrow(() -> new PageNotFoundException("Page with id " + pageID + " does not exists.")).getHtml();
     }
 
     @Override
+    @Cacheable(value = "rootUrls")
     public String getShopRootUrl(long shopID) throws SampleOfferDoesNotExistException {
         Optional<SampleOffer> sampleOffer = getSampleOfferRepository().findByShopID(shopID);
         return sampleOffer.orElseThrow(() -> new SampleOfferDoesNotExistException("No sample offer for shop " +
